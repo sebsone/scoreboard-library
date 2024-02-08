@@ -10,7 +10,7 @@ public class FootballScoreboard : IScoreboard
         if (IsTeamAlreadyPlaying(homeTeam) || IsTeamAlreadyPlaying(awayTeam))
             throw new InvalidOperationException("One or both teams does already have a match in progress.");
         
-        Matches.Add(new FootballMatch(homeTeam, awayTeam));
+        Matches.Add((homeTeam, awayTeam), new FootballMatch(homeTeam, awayTeam));
     }
 
     public void UpdateScore(string homeTeam, string awayTeam, int homeScore, int awayScore)
@@ -18,12 +18,10 @@ public class FootballScoreboard : IScoreboard
         if (string.IsNullOrWhiteSpace(homeTeam) || string.IsNullOrWhiteSpace(awayTeam))
             throw new ArgumentException("Invalid input.");
         
-        if (homeScore < 0 || awayScore < 0)
+        if (IsScoreInvalid(homeScore) || IsScoreInvalid(awayScore))
             throw new ArgumentException("Invalid input. Score cannot be a negative value.");
-        
-        var match = Matches.FirstOrDefault(m => m.HomeTeam == homeTeam && m.AwayTeam == awayTeam);
 
-        if (match == null)
+        if (!Matches.TryGetValue((homeTeam, awayTeam), out var match))
         {
             throw new InvalidOperationException("Match does not exist.");
         }
@@ -36,18 +34,11 @@ public class FootballScoreboard : IScoreboard
     {
         if (string.IsNullOrWhiteSpace(homeTeam) || string.IsNullOrWhiteSpace(awayTeam))
             throw new ArgumentException("Invalid input.");
-        
-        var match = Matches.FirstOrDefault(m => m.HomeTeam == homeTeam && m.AwayTeam == awayTeam);
-        
-        if (match == null)
-        {
-            throw new InvalidOperationException("Match does not exist.");
-        }
 
-        Matches.Remove(match);
+        if (!Matches.Remove((homeTeam, awayTeam))) throw new InvalidOperationException("Match does not exist.");
     }
     
-    public IList<FootballMatch> Matches { get; } = new List<FootballMatch>();
+    public IDictionary<(string HomeTeam, string AwayTeam), FootballMatch> Matches { get; } = new Dictionary<(string, string), FootballMatch>();
 
     public class FootballMatch(string homeTeam, string awayTeam)
     {
@@ -59,6 +50,11 @@ public class FootballScoreboard : IScoreboard
     
     private bool IsTeamAlreadyPlaying(string team)
     {
-        return Matches.Any(m => m.HomeTeam == team || m.AwayTeam == team);
+        return Matches.Any(m => m.Key.HomeTeam == team || m.Key.AwayTeam == team);
+    }
+
+    private static bool IsScoreInvalid(int score)
+    {
+        return score < 0;
     }
 }
