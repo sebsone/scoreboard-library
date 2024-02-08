@@ -167,4 +167,78 @@ public class FootballScoreboardTests
 
         act.Should().Throw<ArgumentException>().WithMessage("Invalid input. Score cannot be a negative value.");
     }
+    
+    [Theory]
+    [InlineData("Norway", "Brazil")]
+    [InlineData("Estonia", "Latvia")]
+    public void FinishMatch_WithValidMatch_MatchIsRemovedFromScoreboard(string homeTeam, string awayTeam)
+    {
+        var scoreBoard = new FootballScoreboard();
+        scoreBoard.StartMatch(homeTeam, awayTeam);
+        
+        scoreBoard.FinishMatch(homeTeam, awayTeam);
+
+        scoreBoard.Matches.Count.Should().Be(0, "because the match should be removed from the scoreboard.");
+    }
+    
+    [Fact]
+    public void FinishMatch_WithValidMatch_CorrectMatchOnlyIsRemovedFromScoreboard()
+    {
+        var scoreBoard = new FootballScoreboard();
+        scoreBoard.StartMatch("Germany", "Spain");
+        scoreBoard.StartMatch("England", "France");
+        scoreBoard.StartMatch("The Netherlands", "Argentina");
+        var expectedMatches = new List<(string homeTeam, string awayTeam)>
+        {
+            ("Germany", "Spain"),
+            ("The Netherlands", "Argentina")
+        };
+        
+        scoreBoard.FinishMatch("England", "France");
+
+        scoreBoard.Matches.Count.Should().Be(2, "because one of the games should be removed.");
+        scoreBoard.Matches.Select(m => (m.HomeTeam, m.AwayTeam))
+            .Should().Equal(expectedMatches, "because the remaining matches should be unchanged.");
+    }
+    
+    [Fact]
+    public void FinishMatch_WithNonExistentMatch_ThrowsException()
+    {
+        var scoreBoard = new FootballScoreboard();
+        
+        var act = () => scoreBoard.FinishMatch("Canada", "Belgium");
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("Match does not exist.");
+    }
+    
+    [Fact]
+    public void FinishMatch_WithOneTeamAlreadyPlaying_ThrowsException()
+    {
+        var scoreBoard = new FootballScoreboard();
+        scoreBoard.StartMatch("Belgium", "Japan");
+        
+        var act = () => scoreBoard.FinishMatch("Canada", "Belgium");
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("Match does not exist.");
+    }
+    
+    [Fact]
+    public void FinishMatch_WithEmptyTeamNames_ThrowsException()
+    {
+        var scoreBoard = new FootballScoreboard();
+        
+        var act = () => scoreBoard.FinishMatch("", "");
+
+        act.Should().Throw<ArgumentException>().WithMessage("Invalid input.");
+    }
+    
+    [Fact]
+    public void FinishMatch_WithWhitespaceTeamNames_ThrowsException()
+    {
+        var scoreBoard = new FootballScoreboard();
+        
+        var act = () => scoreBoard.FinishMatch(" ", "     ");
+
+        act.Should().Throw<ArgumentException>().WithMessage("Invalid input.");
+    }
 }

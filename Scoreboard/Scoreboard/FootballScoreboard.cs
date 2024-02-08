@@ -32,6 +32,21 @@ public class FootballScoreboard : IScoreboard
         match.AwayScore = awayScore;
     }
 
+    public void FinishMatch(string homeTeam, string awayTeam)
+    {
+        if (string.IsNullOrWhiteSpace(homeTeam) || string.IsNullOrWhiteSpace(awayTeam))
+            throw new ArgumentException("Invalid input.");
+        
+        var match = Matches.FirstOrDefault(m => m.HomeTeam == homeTeam && m.AwayTeam == awayTeam);
+        
+        if (match == null)
+        {
+            throw new InvalidOperationException("Match does not exist.");
+        }
+
+        Matches.Remove(match);
+    }
+    
     public IList<FootballMatch> Matches { get; } = new List<FootballMatch>();
 
     public class FootballMatch(string homeTeam, string awayTeam)
