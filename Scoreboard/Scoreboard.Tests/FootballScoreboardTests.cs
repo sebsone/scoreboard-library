@@ -31,15 +31,13 @@ public class FootballScoreboardTests
         scoreboard.StartMatch("Mexico", "USA");
         scoreboard.StartMatch("England", "Scotland");
     
-        scoreboard.Matches.Should().HaveCount(3, "because three matches were started");
-
         var expectedMatches = new List<(string homeTeam, string awayTeam)>
         {
             ("Norway", "Sweden"),
             ("Mexico", "USA"),
             ("England", "Scotland")
         };
-
+        scoreboard.Matches.Should().HaveCount(3, "because three matches were started");
         scoreboard.Matches.Keys.Should().BeEquivalentTo(expectedMatches, "because all started matches should be on the scoreboard.");
     }
     
@@ -272,7 +270,6 @@ public class FootballScoreboardTests
     public void GetScoreboardSummary_WithValidMatchesAndDifferentScores_ReturnsSummary()
     {
         var scoreboard = new FootballScoreboard();
-        
         scoreboard.StartMatch("Denmark", "Iceland");
         scoreboard.StartMatch("Poland", "Saudi Arabia");
         scoreboard.StartMatch("USA", "Wales");
@@ -290,7 +287,6 @@ public class FootballScoreboardTests
     public void GetScoreboardSummary_WithValidMatchesAndDifferentScores_ReturnsSummaryOrderedByScore()
     {
         var scoreboard = new FootballScoreboard();
-        
         scoreboard.StartMatch("Denmark", "Iceland");
         scoreboard.StartMatch("Poland", "Saudi Arabia");
         scoreboard.StartMatch("USA", "Wales");
@@ -412,6 +408,6 @@ public class FootballScoreboardTests
 
         var result = scoreboard.GetScoreboardSummary();
 
-        result.Should().BeEmpty("because there are no matches in the scoreboard.");
+        result.Should().BeEmpty("because there are no matches in the scoreboard");
     }
 }

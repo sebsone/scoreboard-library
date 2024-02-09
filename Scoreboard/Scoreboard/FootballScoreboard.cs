@@ -42,19 +42,24 @@ public class FootballScoreboard : IScoreboard
         new (
             Matches.Values
                 .OrderByDescending(m => m.HomeScore + m.AwayScore)
-                .ThenByDescending(m => m.StartDate)
+                .ThenByDescending(m => m.StartTime)
                 .ToList())
     );
 
     public IDictionary<(string HomeTeam, string AwayTeam), FootballMatch> Matches { get; } = new Dictionary<(string, string), FootballMatch>();
 
+    /// <summary>
+    /// Represents a football match with details about the teams, scores, and start time.
+    /// </summary>
+    /// <param name="homeTeam">The name of the home team.</param>
+    /// <param name="awayTeam">The name of the away team.</param>
     public class FootballMatch(string homeTeam, string awayTeam) : IScoreboardMatch
     {
         public string HomeTeam { get; } = homeTeam;
         public string AwayTeam { get; } = awayTeam;
         public int HomeScore { get; set; }
         public int AwayScore { get; set; }
-        public DateTime StartDate { get; } = DateTime.UtcNow;
+        public DateTime StartTime { get; } = DateTime.UtcNow;
     }
     
     private bool IsTeamAlreadyPlaying(string team)

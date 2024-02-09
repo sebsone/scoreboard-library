@@ -1,5 +1,13 @@
 namespace Scoreboard;
 
+/// <summary>
+/// Defines the interface for a scoreboard managing matches.
+/// </summary>
+/// <remarks>
+/// This interface provides methods for starting, updating, finishing matches,
+/// and getting a summary of ongoing matches. It ensures that all implementing
+/// scoreboard classes provide a consistent set of functionalities for match management.
+/// </remarks>
 public interface IScoreboard
 {
     /// <summary>
@@ -45,6 +53,9 @@ public interface IScoreboard
     List<IScoreboardMatch> GetScoreboardSummary();
 }
 
+/// <summary>
+/// Defines the structure of a scoreboard match, including the teams involved and their scores.
+/// </summary>
 public interface IScoreboardMatch 
 {
     string HomeTeam { get; }
