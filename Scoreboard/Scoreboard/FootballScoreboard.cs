@@ -37,15 +37,24 @@ public class FootballScoreboard : IScoreboard
 
         if (!Matches.Remove((homeTeam, awayTeam))) throw new InvalidOperationException("Match does not exist.");
     }
-    
+
+    public List<IScoreboardMatch> GetScoreboardSummary() => (
+        new (
+            Matches.Values
+                .OrderByDescending(m => m.HomeScore + m.AwayScore)
+                .ThenByDescending(m => m.StartDate)
+                .ToList())
+    );
+
     public IDictionary<(string HomeTeam, string AwayTeam), FootballMatch> Matches { get; } = new Dictionary<(string, string), FootballMatch>();
 
-    public class FootballMatch(string homeTeam, string awayTeam)
+    public class FootballMatch(string homeTeam, string awayTeam) : IScoreboardMatch
     {
         public string HomeTeam { get; } = homeTeam;
         public string AwayTeam { get; } = awayTeam;
         public int HomeScore { get; set; }
         public int AwayScore { get; set; }
+        public DateTime StartDate { get; } = DateTime.UtcNow;
     }
     
     private bool IsTeamAlreadyPlaying(string team)

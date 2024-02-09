@@ -267,4 +267,151 @@ public class FootballScoreboardTests
 
         act.Should().Throw<ArgumentException>().WithMessage("Invalid input.");
     }
+
+    [Fact]
+    public void GetScoreboardSummary_WithValidMatchesAndDifferentScores_ReturnsSummary()
+    {
+        var scoreboard = new FootballScoreboard();
+        
+        scoreboard.StartMatch("Denmark", "Iceland");
+        scoreboard.StartMatch("Poland", "Saudi Arabia");
+        scoreboard.StartMatch("USA", "Wales");
+        scoreboard.UpdateScore("Denmark", "Iceland", 5, 2);
+        scoreboard.UpdateScore("Poland", "Saudi Arabia", 3, 0);
+        scoreboard.UpdateScore("USA", "Wales", 2, 2);
+
+        var result = scoreboard.GetScoreboardSummary();
+        
+        result.Should().NotBeNull("because the function should return a list of ongoing matches.")
+            .And.HaveCount(3, "because the function should return all three matches.");
+    }
+    
+    [Fact]
+    public void GetScoreboardSummary_WithValidMatchesAndDifferentScores_ReturnsSummaryOrderedByScore()
+    {
+        var scoreboard = new FootballScoreboard();
+        
+        scoreboard.StartMatch("Denmark", "Iceland");
+        scoreboard.StartMatch("Poland", "Saudi Arabia");
+        scoreboard.StartMatch("USA", "Wales");
+        scoreboard.UpdateScore("Denmark", "Iceland", 5, 2);
+        scoreboard.UpdateScore("Poland", "Saudi Arabia", 3, 0);
+        scoreboard.UpdateScore("USA", "Wales", 2, 2);
+
+        var result = scoreboard.GetScoreboardSummary();
+        
+        result.Should().NotBeNull("because the function should return a list of ongoing matches")
+            .And.HaveCount(3)
+            .And.ContainItemsAssignableTo<FootballScoreboard.FootballMatch>()
+            .And.SatisfyRespectively(
+            first =>
+            {
+                first.HomeTeam.Should().Be("Denmark");
+                first.AwayTeam.Should().Be("Iceland");
+            },
+            second =>
+            {
+                second.HomeTeam.Should().Be("USA");
+                second.AwayTeam.Should().Be("Wales");
+            },
+            third =>
+            {
+                third.HomeTeam.Should().Be("Poland");
+                third.AwayTeam.Should().Be("Saudi Arabia");
+            });
+    }
+    
+    [Fact]
+    public void GetScoreboardSummary_WithValidMatchesAndSameTotalScores_ReturnsSummaryOrderedByStartTime()
+    {
+        var scoreboard = new FootballScoreboard();
+        scoreboard.StartMatch("Denmark", "Iceland");
+        Thread.Sleep(20);
+        scoreboard.StartMatch("Poland", "Saudi Arabia");
+        Thread.Sleep(20);
+        scoreboard.StartMatch("USA", "Wales");
+        scoreboard.UpdateScore("Denmark", "Iceland", 2, 2);
+        scoreboard.UpdateScore("Poland", "Saudi Arabia", 3, 1);
+        scoreboard.UpdateScore("USA", "Wales", 4, 0);
+
+        var result = scoreboard.GetScoreboardSummary();
+        
+        result.Should().NotBeNull("because the function should return a list of ongoing matches")
+            .And.HaveCount(3)
+            .And.ContainItemsAssignableTo<FootballScoreboard.FootballMatch>()
+            .And.SatisfyRespectively(
+                first =>
+                {
+                    first.HomeTeam.Should().Be("USA");
+                    first.AwayTeam.Should().Be("Wales");
+                },
+                second =>
+                {
+                    second.HomeTeam.Should().Be("Poland");
+                    second.AwayTeam.Should().Be("Saudi Arabia");
+                },
+                third =>
+                {
+                    third.HomeTeam.Should().Be("Denmark");
+                    third.AwayTeam.Should().Be("Iceland");
+                });
+    }
+    
+    [Fact]
+    public void GetScoreboardSummary_WithValidMatchesAndMixedScores_ReturnsSummaryOrderedByScoreThenRecentStartTime()
+    {
+        var scoreboard = new FootballScoreboard();
+        scoreboard.StartMatch("Mexico", "Canada");
+        scoreboard.StartMatch("Spain", "Brazil");
+        scoreboard.StartMatch("Germany", "France");
+        scoreboard.StartMatch("Uruguay", "Italy");
+        scoreboard.StartMatch("Argentina", "Australia");
+        scoreboard.UpdateScore("Mexico", "Canada", 0, 5);
+        scoreboard.UpdateScore("Spain", "Brazil", 10, 2);
+        scoreboard.UpdateScore("Germany", "France", 2, 2);
+        scoreboard.UpdateScore("Uruguay", "Italy", 6, 6);
+        scoreboard.UpdateScore("Argentina", "Australia", 3, 1);
+        
+        var result = scoreboard.GetScoreboardSummary();
+        
+        result.Should().NotBeNull("because the function should return a list of ongoing matches")
+            .And.HaveCount(5)
+            .And.ContainItemsAssignableTo<FootballScoreboard.FootballMatch>()
+            .And.SatisfyRespectively(
+                first =>
+                {
+                    first.HomeTeam.Should().Be("Uruguay");
+                    first.AwayTeam.Should().Be("Italy");
+                },
+                second =>
+                {
+                    second.HomeTeam.Should().Be("Spain");
+                    second.AwayTeam.Should().Be("Brazil");
+                },
+                third =>
+                {
+                    third.HomeTeam.Should().Be("Mexico");
+                    third.AwayTeam.Should().Be("Canada");
+                },
+                fourth =>
+                {
+                    fourth.HomeTeam.Should().Be("Argentina");
+                    fourth.AwayTeam.Should().Be("Australia");
+                },
+                fifth =>
+                {
+                    fifth.HomeTeam.Should().Be("Germany");
+                    fifth.AwayTeam.Should().Be("France");
+                });
+    }
+    
+    [Fact]
+    public void GetScoreboardSummary_WithNoMatches_ReturnsEmptyList()
+    {
+        var scoreboard = new FootballScoreboard();
+
+        var result = scoreboard.GetScoreboardSummary();
+
+        result.Should().BeEmpty("because there are no matches in the scoreboard.");
+    }
 }

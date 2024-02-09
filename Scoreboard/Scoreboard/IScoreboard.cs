@@ -30,4 +30,25 @@ public interface IScoreboard
     /// <exception cref="ArgumentException">Thrown when either team name is null or empty.</exception>
     /// <exception cref="InvalidOperationException">Thrown if a match does not currently exist.</exception>
     void FinishMatch(string homeTeam, string awayTeam);
+
+    /// <summary>
+    /// Returns a summary of matching currently in progress.
+    /// </summary>
+    /// <remarks>
+    /// The summary is ordered primarily by the total score in descending order,
+    /// and then by the start date of the match, with the most recently started match first.
+    /// This method returns an empty list if there are no ongoing matches.
+    /// </remarks>
+    /// <returns>
+    /// A list of type <see cref="IScoreboardMatch"/> representing the summary of ongoing matches.
+    /// </returns>
+    List<IScoreboardMatch> GetScoreboardSummary();
+}
+
+public interface IScoreboardMatch 
+{
+    string HomeTeam { get; }
+    string AwayTeam { get; }
+    int HomeScore { get; }
+    int AwayScore { get; }
 }
