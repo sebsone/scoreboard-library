@@ -25,7 +25,7 @@ scoreboard.FinishMatch("Team A", "Team B");
 var summary = scoreboard.GetScoreboardSummary();
 ```
 
-## Point of considerations
+## Points of consideration
 As this was part of a coding challenge, there were several considerations and assumptions being made on the spot, especially when weighing **simplicity** vs **showcasing skills**. I wanted the solution to be simple and easy to understand but at the same time follow OO best-practices.
 
 #### These are some inner discussions I had while developing:
